@@ -17,10 +17,12 @@ label_names = unpickle(label_map_path)
 np.random.seed(1)
 
 
-test_input = np.array([[0.2,0.1,-4],[0.5,0.2,-1],[0.1,0.3,0.8]]).T
-test_labels = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0]]).T
+# test_input = np.array([[0.2,0.1,-4],[0.5,0.2,-1],[0.1,0.3,0.8]]).T
+# test_labels = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0]]).T
 
-batch_size = test_labels.size
+labels_list = input_dict[b'labels']
+labels = np.zeros((len(labels_list[:]), 10))
+labels[np.arange(len(labels_list[:])), labels_list] = 1
 
 layer1 = NN_layer(3072, 64)
 layer2 = NN_layer(64, 64)
@@ -34,17 +36,8 @@ training_iterations = 4000
 learning_rate = 0.05
 L2reg_constant = 0.005
 
-print(test_labels.shape[1])
+
 print("==== Training ====")
-
-
-input_dict[b'labels']
-
-labels_list = input_dict[b'labels']
-labels = np.zeros((len(labels_list[:]), 10))
-labels[np.arange(len(labels_list[:])), labels_list] = 1
-
-
 
 for epoch in range(training_iterations):
     predictions = forward_pass(NN_layers, input_dict[b'data'].T/255, labels.T, log_loss)
@@ -56,11 +49,5 @@ for epoch in range(training_iterations):
 
 
 
-
-
-
-for epoch in zip(input_dict[b'data'], input_dict[b'labels'][:3]):
-
-    pass#show_np_image(x, label_names[b'label_names'][y])
 
 
