@@ -124,13 +124,19 @@ def backpropagation(NN_layers, da_output_layer):
 
 
 
-def update_parameters(NN_layers, learning_rate):
+def update_parameters(NN_layers, learning_rate, L2reg_constant, m):
     for layer in NN_layers:
-        layer.w = layer.w - learning_rate * layer.dw
+        layer.w = (1-learning_rate*L2reg_constant/m)*layer.w - learning_rate * layer.dw
         layer.b = layer.b - learning_rate * layer.db
 
 
 
+def calculate_accuracy(predictions, labels):
+    predicted_categories = np.argmax(predictions, axis=0)
+    print("predicted_categories", predicted_categories)
+    print("labels", labels)
+    accuracy = np.sum(predicted_categories==labels)/len(labels)
+    print("Accuracy: {}%".format(accuracy))
 
 
 
