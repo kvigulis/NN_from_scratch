@@ -107,8 +107,8 @@ def forward_pass(NN_layers, input, labels, loss):
             # Ouput layer
             predictions = layer.calculate_layer_activations(activation)
             loss.calculate_loss(predictions, labels)
-            print("\n\nPredictions", predictions)
-            print("Cost:", loss.cost)
+            print("\nPredictions", predictions)
+            print("\nCost:", loss.cost)
             return predictions
 
 
@@ -133,9 +133,7 @@ def update_parameters(NN_layers, learning_rate, L2reg_constant, m):
 
 def calculate_accuracy(predictions, labels):
     predicted_categories = np.argmax(predictions, axis=0)
-    print("predicted_categories", predicted_categories)
-    print("labels", labels)
-    accuracy = np.sum(predicted_categories==labels)/len(labels)
+    accuracy = np.sum(predicted_categories==labels)/len(labels)*100
     print("Accuracy: {}%".format(accuracy))
 
 

@@ -32,14 +32,15 @@ NN_layers = [layer1, layer2, output_layer]
 log_loss = CrossEntropyLoss()
 
 
-training_iterations = 4000
+training_iterations = 200
 learning_rate = 0.05
 L2reg_constant = 0.005
 
 
 print("==== Training ====")
 
-for epoch in range(training_iterations):
+for idx, epoch in enumerate(range(training_iterations)):
+    print("\n\nEpoch {} of {}".format((idx+1), training_iterations))
     predictions = forward_pass(NN_layers, input_dict[b'data'].T/255, labels.T, log_loss)
     calculate_accuracy(predictions, input_dict[b'labels']) # Print prediction accuracy
     da_output_layer = predictions - labels.T
