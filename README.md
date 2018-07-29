@@ -1,1 +1,1 @@
-# Multilayer Perceptron implementation using numpy.
+# Multilayer Perceptron implementation using numpy
