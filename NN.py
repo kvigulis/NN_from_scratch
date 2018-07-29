@@ -46,7 +46,7 @@ for idx, epoch in enumerate(range(training_iterations)):
     da_output_layer = predictions - labels.T
     backpropagation(NN_layers, da_output_layer)
     update_parameters(NN_layers, learning_rate, L2reg_constant, labels.shape[1])
-    # TODO: Add regularization
+    # TODO: Add grad checking...
 
 
 
