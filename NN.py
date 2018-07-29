@@ -30,8 +30,6 @@ def derivative_of_reLU(z):
     # Apply Rectified Linear Unit activation function.
     result = np.zeros(z.shape)
     result[z > 0] = 1
-
-    print("Derivative of ReLU ", result)
     return result
 
 
@@ -66,8 +64,7 @@ class NN_layer():
         self.db = np.zeros(layer_size)
 
 
-        # Makes a logits layer
-        self.is_output_layer = is_output_layer
+        self.is_output_layer = is_output_layer  # If True - make turns the layer output into logits.
 
 
     def calculate_layer_activations(self, input, labels=None):
@@ -76,13 +73,7 @@ class NN_layer():
         :param input: activations of the previous layer [x].
         :return:
         '''
-
-        print("w", self.w.shape)
-        print("b", self.b.shape)
-        print("input", input.shape)
-        print("self.w.T.dot(input)", self.w.dot(input).shape)
         self.z = np.add(self.w.dot(input), self.b) # This matrix will also be useful in backpropagation.
-        print("self.z", self.z.shape)
         a = apply_reLU(self.z)
 
         if self.is_output_layer:
@@ -114,69 +105,93 @@ class CrossEntropyLoss():
     def calculate_loss(self, input, labels):
         # Logarithmic loss
         self.loss = np.where(labels == 1, -np.log(input), -np.log(1 - input))
-        print("loss input shape", input.shape[1])
-
         # Calculate the cost of the current sample batch
         self.cost = np.sum(self.loss)/input.shape[1]
 
 
 
 
+def forward_pass(NN_layers, input, labels):
+    activation = None
+    for idx, layer in enumerate(NN_layers):
+        if idx < 1:
+            # First layer
+            activation = layer.calculate_layer_activations(input)
+
+        elif (idx < len(NN_layers)-1):
+            # Hidden layers
+            activation = layer.calculate_layer_activations(activation)
+        else:
+            # Ouput layer
+            predictions = layer.calculate_layer_activations(activation)
+            log_loss.calculate_loss(predictions, labels)
+            print("Predictions", predictions)
+            print("\n\nCost", log_loss.cost)
+            return predictions
+
+
+def backpropagation(NN_layers, da_output_layer):
+    da = None
+    for idx, layer in enumerate(NN_layers[::-1]):
+        if idx < 1:
+            # Lastlayer
+            da = layer.calculate_gradients(da_output_layer)
+        else:
+            # Hidden layers
+            da = layer.calculate_layer_activations(da)
+
+
+
 
 test_input = np.array([[2,1,-4],[3,3,-1],[1,3,8]]).T
-
 test_labels = np.array([1,1,0])
 
 batch_size = test_labels.size
 
-layer1 = NN_layer(3, 4)
-output_layer = NN_layer(4, 2, is_output_layer=True)
+layer1 = NN_layer(3, 10)
+layer2 = NN_layer(10, 10)
+output_layer = NN_layer(10, 2, is_output_layer=True)
 
+
+NN_layers = [layer1, layer2, output_layer]
 
 log_loss = CrossEntropyLoss()
 
 
-print(test_input)
-print(layer1.w)
-print(layer1.b)
+
+print("==== Training ====")
+
+training_iterations = 100
+learning_rate = 0.005
+
+for epoch in range(training_iterations):
+    predictions = forward_pass(NN_layers, test_input, test_labels)
+    da_output_layer = predictions - test_labels
+    backpropagation(NN_layers, da_output_layer)
 
 
 
-activation_l1 = layer1.calculate_layer_activations(test_input)
-activation_output = output_layer.calculate_layer_activations(activation_l1)
 
-log_loss.calculate_loss(activation_output, test_labels)
+    print("\n== Gradients dw==")
+    print("ouput dw", output_layer.dw)
+    print("layer1 dw", layer1.dw)
 
+    print("\n\n== Gradients db==")
+    print("ouput db", output_layer.db)
+    print("layer1 db", layer1.db)
 
-print("Output:", activation_output)
+    layer1.w = layer1.w - learning_rate * layer1.dw
+    layer1.b = layer1.b - learning_rate * layer1.db
 
-
-print("Loss", log_loss.loss)
-print("Cost", log_loss.cost)
-
-da_output_layer =  activation_output - test_labels
-
-print("da_output_layer", da_output_layer)
-
-da_layer1 = output_layer.calculate_gradients(da_output_layer)
-layer1.calculate_gradients(da_layer1)
-print("\n\n== Gradients da==")
-print("ouput da", output_layer.da)
-print("layer1 da", layer1.da)
-
-print("\n\n== Gradients dw==")
-print("ouput dw", output_layer.dw)
-print("layer1 dw", layer1.dw)
-
-
-print("\n\n== Gradients db==")
-print("ouput db", output_layer.db)
-print("layer1 db", layer1.db)
+    output_layer.w = output_layer.w - learning_rate * output_layer.dw
+    output_layer.b = output_layer.b - learning_rate * output_layer.db
 
 
 
-for x, y in zip(input_dict[b'data'][:3], input_dict[b'labels'][:3]):
 
-    pass#show_np_image(x, label_names[b'label_names'][y])
+
+# for epoch in zip(input_dict[b'data'][:3], input_dict[b'labels'][:3]):
+#
+#     pass#show_np_image(x, label_names[b'label_names'][y])
 
 
