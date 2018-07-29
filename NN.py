@@ -77,8 +77,20 @@ class NN_layer():
 
 
 
-def crossEntropyLoss():
-    pass
+class CrossEntropyLoss():
+
+    def __init__(self):
+        self.loss = 0
+        self.cost = 0
+
+    def calculate_loss(self, input, labels):
+        # Logarithmic loss
+        self.loss = np.where(labels == 1, -np.log(input), -np.log(1 - input))
+        print("loss input shape", input.shape[1])
+
+        # Calculate the cost of the current sample batch
+        self.cost = np.sum(self.loss)/input.shape[1]
+
 
 
 class BackProp():
@@ -88,10 +100,13 @@ class BackProp():
         self.da_dz[a > 0] = 1
         print("da/dz", self.da_dz)
 
-test_input = np.array([[2,1,4],[3,3,-1],[1,3,8]]).T
-layer1 = NN_layer(3, 4)
 
-output = NN_layer(4, 3, softmax_output=True)
+
+test_input = np.array([[2,1,4],[3,3,-1],[1,3,8]]).T
+
+layer1 = NN_layer(3, 4)
+output = NN_layer(4, 2, softmax_output=True)
+log_loss = CrossEntropyLoss()
 
 
 print(test_input)
@@ -103,10 +118,15 @@ print(layer1.b)
 activation_l1 = layer1.calculate_layer_activations(test_input)
 activation_output = output.calculate_layer_activations(activation_l1)
 
+log_loss.calculate_loss(activation_output, np.array([1,1,0]))
 
 
 
 print("Output:", activation_output)
+
+
+print("Loss", log_loss.loss)
+print("Cost", log_loss.cost)
 
 
 for x, y in zip(input_dict[b'data'][:3], input_dict[b'labels'][:3]):
