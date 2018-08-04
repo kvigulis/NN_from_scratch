@@ -34,10 +34,16 @@ def softmax(x):
 
 class NN_layer():
     def __init__(self, input_size, layer_size, is_output_layer=False):
+        '''
+        Defines a layer for a Fully Connected Neural Network.
+        :param input_size: Essentially the number of nodes in the previous layer. I.e. Input connections for one node.
+        :param layer_size: Number of nodes in this layer
+        :param is_output_layer: Set to True if this is used as an output layer.
+        '''
         # Use standard normal distribution to initialise the weights and biases.
         # And apply the vanishing gradient prevention trick [ *np.sqrt(2/input_size) ].
-        self.w = np.random.randn(layer_size, input_size)*np.sqrt(2/input_size)
-        self.b = (np.random.randn(layer_size)*np.sqrt(2/input_size)).reshape(layer_size,1)
+        self.w = np.random.randn(layer_size, input_size)*np.sqrt(2/input_size) # 'He' initialization
+        self.b = (np.random.randn(layer_size)*np.sqrt(2/input_size)).reshape(layer_size,1) # 'He' initialization
         self.z = np.zeros(layer_size)  # This value is useful for backprop after forward pass.
 
         self.dz = np.zeros(layer_size)
